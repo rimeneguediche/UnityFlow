@@ -17,6 +17,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     private  static final String SECRET_KEY ="72d8eb99bf8ff346b7bd40eb25088e261bd826a552cd9a68c6d7f024a8514813";
     public String extractUsername(String token) {
@@ -37,7 +38,7 @@ public class JwtService {
     Map<String, Object> extraClaims,
     UserDetails userDetails
             ){
-        return  Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 24 )).signWith(getSignInKey(), SignatureAlgorithm.ES256).compact();
+        return  Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 24 )).signWith(key,SignatureAlgorithm.HS512).compact();
     }
 
     public boolean isTokenValid(String token , UserDetails userDetails){
