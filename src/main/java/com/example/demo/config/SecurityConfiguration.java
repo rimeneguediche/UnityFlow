@@ -1,9 +1,11 @@
 package com.example.demo.config;
 
 
+import com.example.demo.Entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -32,8 +35,11 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests
-                        (request -> request.requestMatchers("/api/v1/auth/**","/api/v1/demo-controller")
-                        .permitAll())
+                        (auth ->
+                        auth.requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/v1/**").permitAll().anyRequest().authenticated()
+
+                )
                 .sessionManagement
                         (manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(applicationConfig
@@ -42,7 +48,8 @@ public class SecurityConfiguration {
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                 .logoutUrl("/api/v1/auth/logout") // Specify the logout URL
-                        .addLogoutHandler(logoutHandler).logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
+                        .addLogoutHandler(logoutHandler).logoutSuccessHandler((request, response, authentication)
+                                -> SecurityContextHolder.clearContext()));
 
         return http.getOrBuild();
     }

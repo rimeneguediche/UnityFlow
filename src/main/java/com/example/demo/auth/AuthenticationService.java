@@ -7,10 +7,13 @@ import com.example.demo.config.JwtService;
 import com.example.demo.token.Token;
 import com.example.demo.token.TokenRepository;
 import com.example.demo.token.TokenType;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +54,10 @@ public class AuthenticationService {
                         request.getEmail(),
                         request.getPassword())
         );
+
+
+
+
 
         var user =repository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken =jwtService.generateToken(user);
